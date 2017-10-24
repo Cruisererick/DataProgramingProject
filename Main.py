@@ -1,4 +1,5 @@
 import DownloadFiles
+#-*- coding: utf-8 -*-
 
 def main():
     DownloadFiles.download()
