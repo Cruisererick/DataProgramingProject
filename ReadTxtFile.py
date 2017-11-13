@@ -30,7 +30,8 @@ def pandasway(file):
             df.to_csv(filename.format(i))
 
 
-def read_beautiful(file):
+def read_beautiful(file, folder):
+    file = folder + '//' + file
     open_file = open(file)
     beatifull = bs(open_file)
     tables = beatifull.find_all("table", attrs={'class': 'report'})
@@ -43,17 +44,20 @@ def read_beautiful(file):
         rows = []
         for row in table.find_all('tr'):
             rows.append([str(val.text.encode('utf8'))[1:].replace('\\xc2', '').replace('$', '').replace('"', '').replace('\\xa0', '').replace('\\n', '').replace("'", '') for val in row.find_all('td')])
-        filename = 'D://One company//2017-Q3//1325702-MAGNACHIP SEMICONDUCTOR Corp//' + title + '.csv'
+        filename = folder + '//' + title + '.csv'
         counter += 1
         try:
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         except:
-            filename = 'D://One company//2017-Q3//1325702-MAGNACHIP SEMICONDUCTOR Corp//table' + counter + '.csv'
+            filename = folder + '//table' + str(counter) + '.csv'
             counter += 1
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-        with open(filename, 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(headers)
-            writer.writerows(row for row in rows if row)
+        try:
+            with open(filename, 'w') as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                writer.writerows(row for row in rows if row)
+        except:
+            print(filename)
 
 
