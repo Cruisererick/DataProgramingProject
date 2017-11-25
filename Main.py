@@ -1,15 +1,36 @@
 import DownloadFiles
 import ReadTxtFile
 import os
+import csv
 #-*- coding: utf-8 -*-
 
 def main():
 
-    #get_data()
-    #filename = "D://One company//2017-Q3//1325702-MAGNACHIP SEMICONDUCTOR Corp//10-Q-2017-08-04.html"
+    get_data()
+    filename = "D://One company//2017-Q3//1325702-MAGNACHIP SEMICONDUCTOR Corp//10-Q-2017-08-04.html"
     folder = "D://Data//2017-Q1"
     #create_csv_tables(folder)
-    create_csv_common_table(folder)
+    #create_csv_common_table(folder)
+    #load_table()
+
+
+def create_custom_table(tableName, parameter, folder):
+    final_table = {}
+    table = []
+    for subdir, dirs, files in os.walk(folder):
+        if os.path.isdir(files):
+            create_custom_table(tableName, parameter, files)
+        else:
+            for file in files:
+                if tableName + ".csv" in str(file):
+                    company = subdir.split("\\")
+                    table = load_table(file, tableName + ".csv")
+                    for lines in table:
+                        if parameter in lines:
+                            aux = parameter.split(",")
+                            touple = [aux[1], aux[2]]
+                            final_table[company[1]] = touple
+
 
 
 def create_csv_common_table(folder):
@@ -35,6 +56,14 @@ def create_csv_common_table(folder):
     df = pd.DataFrame(data, columns=['Table', 'Company'])
     df.to_csv(filename, index=False)
 
+def load_table(folder, tablename):
+    filename = folder + "//" + tablename
+    table_list = []
+    file_object = open(filename, 'r')
+    for lines in file_object:
+        print(lines)
+        table_list.append(lines)
+    return table_list
 
 
 def create_csv_tables(folder):
@@ -47,7 +76,7 @@ def create_csv_tables(folder):
 
 
 def get_data():
-    year = "2007"
+    year = "2016"
     Q1 = open("C://Users//eric//Desktop//Files for XBRL//Index " + year + "//Q1.txt", "r")
     Q2 = open("C://Users//eric//Desktop//Files for XBRL//Index " + year + "//Q2.txt", "r")
     Q3 = open("C://Users//eric//Desktop//Files for XBRL//Index " + year + "//Q3.txt", "r")

@@ -9,7 +9,7 @@ def download(file, Q, year):
 
         i = 0
         r = re.compile('.*\|.*\|.*\|.*\|.*')
-        j = 0;
+        j = 0
         for line in file:
             if r.match(line):
                 if j > 0:
@@ -22,24 +22,24 @@ def download(file, Q, year):
                     elif '\\' in elements[1]:
                         name = elements[1].split('\\')
                         elements[1] = name[0].strip()
-                    if elements[1] == "MAGNACHIP SEMICONDUCTOR Corp":
-                        url = "https://www.sec.gov/Archives/" + elements[4]
-                        try:
-                            html = urllib.request.urlopen(url)
+                    #if elements[1] == "MAGNACHIP SEMICONDUCTOR Corp":
+                    url = "https://www.sec.gov/Archives/" + elements[4]
+                    try:
+                        html = urllib.request.urlopen(url)
 
-                            content = html.read()
-                            filename = 'D://One company//' + year + "-" + Q + '//' \
-                                       + elements[0] + "-" + elements[1] + '//' + elements[2] + "-" + elements[3] + '.xml'
-                            os.makedirs(os.path.dirname(filename), exist_ok=True)
-                            content = content.decode("utf-8")
-                            save = open(filename, 'w')
-                            try:
-                                save.write(content)
-                            except:
-                                print(url)
-                                print(Q)
-                            save.close()
+                        content = html.read()
+                        filename = 'D://Data//' + year + "-" + Q + '//' \
+                                   + elements[0] + "-" + elements[1] + '//' + elements[2] + "-" + elements[3] + '.xml'
+                        os.makedirs(os.path.dirname(filename), exist_ok=True)
+                        content = content.decode("utf-8")
+                        save = open(filename, 'w')
+                        try:
+                            save.write(content)
                         except:
                             print(url)
                             print(Q)
+                        save.close()
+                    except:
+                        print(url)
+                        print(Q)
                 j += 1
