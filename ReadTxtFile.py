@@ -30,34 +30,42 @@ def pandasway(file):
             df.to_csv(filename.format(i))
 
 
-def read_beautiful(file, folder):
+def read_beautiful(file, folder, table_name):
     file = folder + '//' + file
-    open_file = open(file)
-    beatifull = bs(open_file)
-    tables = beatifull.find_all("table", attrs={'class': 'report'})
-    list_tables = []
-    counter = 0
-    for table in tables:
-        title = table.find('strong')
-        headers = [str(header.text) for header in table.find_all('th')]
-        title = str(headers[0]).replace('\\xc2', '').replace('$', '').replace('"', '').replace('\\xa0', '').replace('\\n', '').replace("'", '').replace('[', '').replace(']', '').replace('\\', '').replace('/', '')
-        rows = []
-        for row in table.find_all('tr'):
-            rows.append([str(val.text.encode('utf8'))[1:].replace('\\xc2', '').replace('$', '').replace('"', '').replace('\\xa0', '').replace('\\n', '').replace("'", '') for val in row.find_all('td')])
-        filename = folder + '//' + title + '.csv'
-        counter += 1
-        try:
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
-        except:
-            filename = folder + '//table' + str(counter) + '.csv'
-            counter += 1
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
-        try:
-            with open(filename, 'w') as f:
-                writer = csv.writer(f)
-                writer.writerow(headers)
-                writer.writerows(row for row in rows if row)
-        except:
-            print(filename)
+    try:
+        open_file = open(file)
+        beatifull = bs(open_file)
+        tables = beatifull.find_all("table", attrs={'class': 'report'})
+        list_tables = []
+        counter = 0
+        for table in tables:
+            title = table.find('strong')
+            headers = [str(header.text) for header in table.find_all('th')]
+            title = str(headers[0]).replace('\\xc2', '').replace('\xe2', '').replace('\x80', '').replace('\x94', '').replace('\t', '').replace(')', '').replace('(', '').replace('$', '').replace('"', '').replace('\\xa0', '').replace('\n', '').replace('\\n', '').replace("'", '').replace('[', '').replace(']', '').replace('\\', '').replace('/', '')
+            date = file.split("_")
+            date = date[1].split(".")
+            if table_name.lower() in title.lower() or table_name.lower() == title.lower():
+                rows = []
+                for row in table.find_all('tr'):
+                    rows.append([str(val.text.encode('utf8'))[1:].replace('\\xc2', '').replace('\xe2', '').replace('\x80', '').replace('\x94', '').replace('\t', '').replace(')', '').replace('(', '').replace('$', '').replace('"', '').replace('\\xa0', '').replace('\\n', '').replace("'", '') for val in row.find_all('td')])
+                filename = folder + '//' + date[0] + "_" + title.replace("\n", "") + '.csv'
+                counter += 1
+                try:
+                    os.makedirs(os.path.dirname(filename), exist_ok=True)
+                except:
+                    filename = folder + '//' + date[0] + "_" + 'table' + str(counter) + '.csv'
+                    counter += 1
+                    os.makedirs(os.path.dirname(filename), exist_ok=True)
+                try:
+                    with open(filename, 'w') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(headers)
+                        writer.writerows(row for row in rows if row)
+                except:
+                    print(filename)
+            else:
+                pass
+    except FileNotFoundError:
+        print(file)
 
 
