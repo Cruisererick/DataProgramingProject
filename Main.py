@@ -32,11 +32,11 @@ def tables_per_quater(folder, table_name):
 
 
 def main():
-    index_data = "D://Files for XBRL//index "
-    save_folder = 'D://finaldata'
+    index_data = "E://Files for XBRL//index "
+    save_folder = 'E://finaldata'
     year = 2014
-    years = [2012, 2013]
-    table = "CONSOLIDATED BALANCE SHEETS"
+    years = [2012, 2013, 2014, 2015, 2016]
+    table = "CONSOLIDATED BALANCE SHEETS - USD   in Thousands.csv"
     parameter = "Total assets"
 
     magna = "D://Magna"
@@ -47,17 +47,25 @@ def main():
         #get_data(index_data, x, save_folder)
         #create_csv_tables(save_folder, table, x)
 
-   # for subdir, dirs, files in os.walk(save_folder):
-  #     if len(dirs) > 1:
- #           for item in dirs:
-#                find_companies(save_folder + "//" + item)
+    general_function_to_create_tables(save_folder, table, parameter)
+    general_function_plot()
 
-    #create_custom_dict(table, parameter, save_folder)
-    #create_custom_table(table, parameter)
 
-    folder = 'C://Users//eric//PycharmProjects//DataProgramingProject//Custom Tables'
-    tablename = 'CONSOLIDATED BALANCE SHEETS_Total assets.csv'
+def general_function_plot():
+    folder = 'C://Users//Juan//PycharmProjects//DataProgramingProject//Custom Tables'
+    tablename = 'CONSOLIDATED BALANCE SHEETS - USD   in Thousands.csv_Total assets.csv'
     plot(folder, tablename)
+
+
+def general_function_to_create_tables(save_folder, table, parameter):
+    for subdir, dirs, files in os.walk(save_folder):
+       if len(dirs) > 1:
+            for item in dirs:
+                find_companies(save_folder + "//" + item)
+
+    create_custom_dict(table, parameter, save_folder)
+    create_custom_table(table, parameter)
+
 
 
 def find_companies(folder):
@@ -68,7 +76,6 @@ def find_companies(folder):
                     company_dict_times[item] += 1
                 else:
                     company_dict_times[item] = 0
-
 
 
 def create_custom_table(table, parameter):
@@ -273,11 +280,12 @@ def plot(folder, tablename):
 
     counter = 0
     for items in y:
-        plt.plot(x, items)
-        plt.title('Consolidated Balance Sheet new\nTotal Assets')
-        plt.xlabel('Timeline')
-        plt.ylabel('Account Balance')
-        counter += 1
+        if 0 not in items:
+            plt.plot(x, items)
+            plt.title('Consolidated Balance Sheet new\nTotal Assets')
+            plt.xlabel('Timeline')
+            plt.ylabel('Account Balance')
+            counter += 1
     plt.show()
 
 if __name__ == '__main__':
