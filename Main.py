@@ -15,6 +15,7 @@ import pandas as pd
 #-*- coding: utf-8 -*-
 
 final_table = collections.OrderedDict()
+company_dict_times = collections.OrderedDict()
 globvar = 0
 
 def set_globvar_to_one():
@@ -31,27 +32,43 @@ def tables_per_quater(folder, table_name):
 
 
 def main():
-    index_data = "E://Files for XBRL//index "
-    save_folder = 'E://finaldata'
+    index_data = "D://Files for XBRL//index "
+    save_folder = 'D://finaldata'
     year = 2014
-    years = [2012, 2013, 2017]
-    table = "Consolidated Balance Sheets"
+    years = [2012, 2013]
+    table = "CONSOLIDATED BALANCE SHEETS"
     parameter = "Total assets"
 
-    magna = "E://Magna"
+    magna = "D://Magna"
 
     #get_data(index_data, year, save_folder)
 
-    for x in years:
+    #for x in years:
         #get_data(index_data, x, save_folder)
-        create_csv_tables(save_folder, table, x)
+        #create_csv_tables(save_folder, table, x)
 
-    #create_custom_dict(table, parameter, magna)
+   # for subdir, dirs, files in os.walk(save_folder):
+  #     if len(dirs) > 1:
+ #           for item in dirs:
+#                find_companies(save_folder + "//" + item)
+
+    #create_custom_dict(table, parameter, save_folder)
     #create_custom_table(table, parameter)
 
-    #folder = 'C://Users//Juan//PycharmProjects//DataProgramingProject//Custom Tables'
-    #tablename = 'Consolidated Balance Sheets_Total assets.csv'
-    #plot(folder, tablename)
+    folder = 'C://Users//eric//PycharmProjects//DataProgramingProject//Custom Tables'
+    tablename = 'CONSOLIDATED BALANCE SHEETS_Total assets.csv'
+    plot(folder, tablename)
+
+
+def find_companies(folder):
+    for subdir, dirs, files in os.walk(folder):
+        if len(dirs) > 1:
+            for item in dirs:
+                if item in company_dict_times:
+                    company_dict_times[item] += 1
+                else:
+                    company_dict_times[item] = 0
+
 
 
 def create_custom_table(table, parameter):
@@ -120,39 +137,41 @@ def create_custom_dict(tableName, parameter, folder):
                 create_custom_dict(tableName, parameter, folder + "//" + item)
         else:
             for file in files:
-                if tableName.lower() in file.lower() or "Consolidated Balance Sheets".lower() in file.lower():
+                if tableName.lower() in file.lower():
                     company = subdir.split("//")
                     company = company[len(company) - 1].split("\\")
                     company = company[len(company) - 1]
-                    table = load_table(subdir, file)
-                    date = file.split("_")
-                    date = get_date(date)
-                    if table is not None:
-                        counter = 0
-                        dates = []
-                        dates_dict = {}
-                        for row in table:
-                            if counter is 0:
-                                dates.append(row[1])
-                                #dates.append(row[2])
-                                counter += 1
-                            if parameter == row[0]:
-                                dates[0] = dates[0].replace(".", " ").replace(",", " ")
-                                #dates[1] = dates[1].replace(".", " ").replace(",", " ")
-                                try:
-                                    datetime_object0 = date
-                                    #datetime_object1 = datetime.strptime(dates[1], '%b %d %Y')
-                                    number = re.sub('[^0-9.,]', '', row[1])
-                                    dates_dict[datetime_object0] = number
-                                    #dates_dict[datetime_object1] = row[2]
-                                    if company in final_table:
-                                        final_table[company].append(dates_dict)
-                                    else:
-                                        aux_list = []
-                                        aux_list.append(dates_dict)
-                                        final_table[company] = aux_list
-                                except:
-                                    pass
+                    if company in company_dict_times:
+                        if company_dict_times[company] == 19:
+                            table = load_table(subdir, file)
+                            date = file.split("_")
+                            date = get_date(date)
+                            if table is not None:
+                                counter = 0
+                                dates = []
+                                dates_dict = {}
+                                for row in table:
+                                    if counter is 0:
+                                        dates.append(row[1])
+                                        #dates.append(row[2])
+                                        counter += 1
+                                    if parameter == row[0]:
+                                        dates[0] = dates[0].replace(".", " ").replace(",", " ")
+                                        #dates[1] = dates[1].replace(".", " ").replace(",", " ")
+                                        try:
+                                            datetime_object0 = date
+                                            #datetime_object1 = datetime.strptime(dates[1], '%b %d %Y')
+                                            number = re.sub('[^0-9.,]', '', row[1])
+                                            dates_dict[datetime_object0] = number
+                                            #dates_dict[datetime_object1] = row[2]
+                                            if company in final_table:
+                                                final_table[company].append(dates_dict)
+                                            else:
+                                                aux_list = []
+                                                aux_list.append(dates_dict)
+                                                final_table[company] = aux_list
+                                        except:
+                                            pass
 
 
 def create_csv_common_table(folder):
@@ -255,7 +274,7 @@ def plot(folder, tablename):
     counter = 0
     for items in y:
         plt.plot(x, items)
-        plt.title('Consolidated Balance Sheet\nTotal Assets')
+        plt.title('Consolidated Balance Sheet new\nTotal Assets')
         plt.xlabel('Timeline')
         plt.ylabel('Account Balance')
         counter += 1
