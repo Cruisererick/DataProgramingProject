@@ -39,7 +39,7 @@ def download(file, Q, year, savefolder):
                                 counter += 1
                                 print(counter)
                                 if counter > 1000:
-                                    pass
+                                    break
                             except:
                                 print(url)
                                 print(Q)

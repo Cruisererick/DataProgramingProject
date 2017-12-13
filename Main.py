@@ -6,9 +6,23 @@ import collections
 import pandas as pd
 from datetime import datetime
 import re
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib import colors as mcolors
+import csv
+import numpy as np
+import pandas as pd
 #-*- coding: utf-8 -*-
 
 final_table = collections.OrderedDict()
+globvar = 0
+
+def set_globvar_to_one():
+    global globvar    # Needed to modify global copy of globvar
+    globvar += 1
+
+def print_globvar():
+    print(globvar)
 
 
 def tables_per_quater(folder, table_name):
@@ -17,20 +31,27 @@ def tables_per_quater(folder, table_name):
 
 
 def main():
-    index_data = "C://Users//eric//Desktop//Files for XBRL//Index "
-    save_folder = 'C://DataPrograming'
-    year = 2016
+    index_data = "E://Files for XBRL//index "
+    save_folder = 'E://finaldata'
+    year = 2014
+    years = [2012, 2013, 2017]
     table = "Consolidated Balance Sheets"
     parameter = "Total assets"
-    get_data(index_data, year, save_folder)
 
+    magna = "E://Magna"
 
-    #create_csv_tables(save_folder, table)
+    #get_data(index_data, year, save_folder)
 
+    for x in years:
+        #get_data(index_data, x, save_folder)
+        create_csv_tables(save_folder, table, x)
 
-    #create_custom_dict(table, parameter, save_folder)
+    #create_custom_dict(table, parameter, magna)
     #create_custom_table(table, parameter)
 
+    #folder = 'C://Users//Juan//PycharmProjects//DataProgramingProject//Custom Tables'
+    #tablename = 'Consolidated Balance Sheets_Total assets.csv'
+    #plot(folder, tablename)
 
 
 def create_custom_table(table, parameter):
@@ -43,8 +64,9 @@ def create_custom_table(table, parameter):
         for dicts in value:
             for key_date, value_date in dicts.items():
                 try:
-                    aux.append(value_date)
-                    dates_in_time.add(key_date)
+                    if key_date is not None and value_date is not None:
+                        aux.append(value_date)
+                        dates_in_time.add(key_date)
                 except:
                     pass
     dates_in_time = sorted(dates_in_time)
@@ -112,7 +134,7 @@ def create_custom_dict(tableName, parameter, folder):
                         for row in table:
                             if counter is 0:
                                 dates.append(row[1])
-                                dates.append(row[2])
+                                #dates.append(row[2])
                                 counter += 1
                             if parameter == row[0]:
                                 dates[0] = dates[0].replace(".", " ").replace(",", " ")
@@ -170,18 +192,25 @@ def load_table(folder, tablename):
         return None
 
 
-def create_csv_tables(folder, table_name):
+def create_csv_tables(folder, table_name, year):
 
-    for subdir, dirs, files in os.walk(folder):
-        if len(dirs) > 0:
-            for one_folder in dirs:
-                create_csv_tables(folder + "//" + one_folder, table_name)
-        else:
-            for file in files:
-                if '.csv' in file:
-                    print(subdir + '//' + file)
-                    ReadTxtFile.read_beautiful(file, subdir, table_name)
+    Q1 = folder + "//" + str(year) + "-Q1"
+    Q2 = folder + "//" + str(year) + "-Q2"
+    Q3 = folder + "//" + str(year) + "-Q3"
+    Q4 = folder + "//" + str(year) + "-Q4"
+    list = [Q1, Q2, Q3, Q4]
 
+    for x in range(0, 4):
+        counter = 0
+        for subdir, dirs, files in os.walk(list[x]):
+            for directory in dirs:
+                for y, k, actual_files in os.walk(list[x] + "//" + directory):
+                    for file in actual_files:
+                        if ".xml" in file:
+                            counter += 1
+                            print(counter)
+                            ReadTxtFile.read_beautiful(file, list[x] + "//" + directory, table_name)
+                            print(list[x] + "//" + directory + "//" + file)
 
 
 def get_data(index_folder, year, savefolder):
@@ -196,6 +225,41 @@ def get_data(index_folder, year, savefolder):
         DownloadFiles.download(list[x], "Q" + str(x + 1), year, savefolder)
     print("End")
 
+
+def plot(folder, tablename):
+    df = load_table(folder, tablename)
+    counter = 0
+    maximum = 0
+    x = []
+    y = []
+    k = []
+    for line in df:
+        if counter == 0:
+            counter += 1
+            for elements in line:
+                try:
+                    if elements != "Company":
+                        u = datetime.strptime(elements, '%Y-%m-%d')
+                        x.append(u)
+                except:
+                    pass
+            counter += 1
+        else:
+            c = line[0]
+            k.append(c)
+            v = list(map(float,line[1:]))
+            for elements in v:
+                if elements > 0:
+                    y.append(v)
+
+    counter = 0
+    for items in y:
+        plt.plot(x, items)
+        plt.title('Consolidated Balance Sheet\nTotal Assets')
+        plt.xlabel('Timeline')
+        plt.ylabel('Account Balance')
+        counter += 1
+    plt.show()
 
 if __name__ == '__main__':
     main()
